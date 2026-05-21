@@ -35,5 +35,19 @@ namespace Generar {
         return gap;
     }
 
+    template<typename T>
+    vector<T> vectorSample(vector<T> v, int n) {
+        vector<T> sample;
+        sample.reserve(n);
+        int b = 1024; //1024 or 4096 or 8192
+        int i=0;
+        while (i < (int)v.size()) {
+            sample.push_back(v[i]);
+            i+=b;
+        }
+
+        return sample;
+    }
+
 }
 

@@ -27,7 +27,13 @@ int main(int argc, char** argv) {
         auto vec_gap = Generar::vectorGap<int32_t>(vec, 1e7);
         auto tgap2 = chrono::high_resolution_clock::now();
         auto tgap = std::chrono::duration_cast<std::chrono::milliseconds>(tgap2 - tgap1);
-    
+
+        //sample vector
+        auto tsample1 = chrono::high_resolution_clock::now();
+        auto vec_sample = Generar::vectorSample<int32_t>(vec, 1e7);
+        auto tsample2 = chrono::high_resolution_clock::now();
+        auto tsample = std::chrono::duration_cast<std::chrono::milliseconds>(tsample2 - tsample1);
+        
 
 		        
         println("Time taken to generate and sort vector: {} ms", tgenerar / 1ms);
@@ -44,8 +50,17 @@ int main(int argc, char** argv) {
         for (size_t i = 0; i < n; ++i) {
             print("{} ", vec_gap[i]);
         }
-        println();
+        println();println();
 
+        
+        println("Time taken to generate sample vector: {} ms", tsample / 1ms);
+        print("First 10 elements of the sample vector: ");
+        n = min(10, (int)vec_sample.size());
+        for (size_t i = 0; i < n; ++i) {
+            print("{} ", vec_sample[i]);
+        }
+        println();println();
+        
 
     } else if (argc == 4) {
         println("Complete mode");
