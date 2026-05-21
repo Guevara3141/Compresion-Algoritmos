@@ -24,4 +24,16 @@ namespace Generar {
         return v;
     }
 
+    template<typename T>
+    vector<T> vectorGap(vector<T> v, int n) {
+        vector<T> gap(n);
+        gap[0] = v[0];
+
+        for (int i = 1; i < n; ++i) 
+            gap[i] = v[i] - v[i-1];
+
+        return gap;
+    }
+
 }
+
