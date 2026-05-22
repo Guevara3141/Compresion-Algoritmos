@@ -1,6 +1,8 @@
-#include <bits/stdc++.h>
-#include "include/generar.hpp"
+#include <cstring>
+#include <vector>
+#include <chrono>
 #include <print>
+#include "include/generar.hpp"
 
 using namespace std;
 
@@ -16,12 +18,11 @@ int main(int argc, char** argv) {
         auto tgenerar1 = chrono::high_resolution_clock::now();
 
         auto vec = Generar::vectorUniforme<int32_t>(1e7);
-		sort(vec.begin(), vec.end());
+	sort(vec.begin(), vec.end());
 
         auto tgenerar2 = chrono::high_resolution_clock::now();
-		auto tgenerar = std::chrono::duration_cast<std::chrono::milliseconds>(tgenerar2 - tgenerar1);
-
-
+	auto tgenerar = std::chrono::duration_cast<std::chrono::milliseconds>(tgenerar2 - tgenerar1);
+	
         //gap vector
         auto tgap1 = chrono::high_resolution_clock::now();
         auto vec_gap = Generar::vectorGap<int32_t>(vec, 1e7);
@@ -35,9 +36,9 @@ int main(int argc, char** argv) {
         auto tsample = std::chrono::duration_cast<std::chrono::milliseconds>(tsample2 - tsample1);
         
 
-		        
         println("Time taken to generate and sort vector: {} ms", tgenerar / 1ms);
         print("First 10 elements of the sorted vector: ");
+
         size_t n = min(10, (int)vec.size());
         for (size_t i = 0; i < n; ++i) {
             print("{} ", vec[i]);

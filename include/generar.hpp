@@ -1,6 +1,7 @@
 #pragma once
 
-#include <bits/stdc++.h>
+#include <vector>
+#include <random>
 
 namespace Generar {
     using namespace std;
