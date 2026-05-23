@@ -18,10 +18,10 @@ int main(int argc, char** argv) {
         auto tgenerar1 = chrono::high_resolution_clock::now();
 
         auto vec = Generar::vectorUniforme<int32_t>(1e7);
-	sort(vec.begin(), vec.end());
+	    sort(vec.begin(), vec.end());
 
         auto tgenerar2 = chrono::high_resolution_clock::now();
-	auto tgenerar = std::chrono::duration_cast<std::chrono::milliseconds>(tgenerar2 - tgenerar1);
+	    auto tgenerar = std::chrono::duration_cast<std::chrono::milliseconds>(tgenerar2 - tgenerar1);
 	
         //gap vector
         auto tgap1 = chrono::high_resolution_clock::now();
