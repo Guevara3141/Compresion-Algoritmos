@@ -31,17 +31,15 @@ vector<int> vectorSample(vector<int> v, int n) {
     return sample;
 }
 
-bool sample_range(vector<int> &sample, int b, int x, int &L, int &R) {
-    auto it = lower_bound(sample.begin(), sample.end(), x);
-    if (it == sample.begin()) return false;
+bool sample_range(vector<int> &sample, int b, int x, int n, int &L, int &R) {
+    if (x < sample[0]) return false;
+    auto it = upper_bound(sample.begin(), sample.end(), x);
+    int sample_pos = it - sample.begin() - 1;
 
-    int sample_pos = it - sample.begin();
+    L = sample_pos * b;
 
-    if (sample_pos == 0) L = sample_pos;
-    else L = (sample_pos-1) * b;
-
-    if (it == sample.end()) R = (int)sample.size() - 1;
-    else R = sample_pos * b;
+    if (sample_pos + 1 < (int)sample.size()) R = (sample_pos+1) * b;
+    else R = n;
 
     return true;
 }
@@ -87,7 +85,7 @@ int main() {
     cout << "sample: "; vectorPrint(sample);
 
     int L, R;
-    sample_range(sample, b, search_element, L, R);
+    sample_range(sample, b, search_element, size, L, R);
     cout << "L_idx: " << L << "  A[L] = " << A[L] << "\nR_idx: " << R << "  A[R] = " << A[R] << endl;
 
     GC_decode(gap, sample, search_element, 2, L, R) ? cout << "true" << endl : cout << "false" << endl;

@@ -6,16 +6,15 @@ namespace Busqueda {
     using namespace std;
 
     template<typename T>
-    bool sample_range(vector<T> &sample, int b, T x, int &L, int &R) {
-        auto it = lower_bound(sample.begin(), sample.end(), x);
-        if (it == sample.begin()) return false;
-        int sample_pos = it - sample.begin();
+    bool sample_range(vector<T> &sample, int b, T x, int n, int &L, int &R) {
+        if (x < sample[0]) return false;
+        auto it = upper_bound(sample.begin(), sample.end(), x);
+        int sample_pos = it - sample.begin() - 1;
 
-        if (sample_pos == 0) L = sample_pos;
-        else L = (sample_pos-1) * b;
+        L = sample_pos * b;
 
-        if (it == sample.end()) R = (int)sample.size() - 1;
-        else R = sample_pos * b;
+        if (sample_pos + 1 < (int)sample.size()) R = (sample_pos+1) * b;
+        else R = n;
 
         return true;
     }
