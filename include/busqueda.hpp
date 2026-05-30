@@ -37,7 +37,6 @@ namespace Busqueda {
     template <typename T>
     bool GC_decode(vector<T> &GC, vector<T> &sample, T x, int b, int L, int R) {
         T curr = sample[L/b]; // A[L] = sample[L/b]
-        cout << "curr: " << curr << endl;
         if (curr == x) return true;
 
         for (int i=L+1; i <= R; ++i) {
@@ -47,9 +46,7 @@ namespace Busqueda {
         entonces A[i] = GC[i] + A[i-1]
         por lo tanto curr = A[L] = A[i-1]
         */
-            cout << "i: " << i << "     curr: " << curr << endl;
             if (curr == x) return true;
-            
         }
 
         return false;

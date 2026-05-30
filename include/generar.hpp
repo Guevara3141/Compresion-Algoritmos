@@ -12,7 +12,7 @@ namespace Generar {
     template<typename T>
     vector<T> vectorUniforme(int n) {
         vector<T> v;
-                v.reserve(n);
+        v.reserve(n);
 
         uniform_int_distribution<T> distribucion(
             numeric_limits<T>::min(),
@@ -23,6 +23,24 @@ namespace Generar {
             v.push_back(distribucion(generador));
 
         return v;
+    }
+
+    template<typename T>
+    vector<T> vectorGauss(int n, double mean, double dev) {
+        vector<T> v;
+        v.reserve(n);
+
+        normal_distribution<double> distribucion(mean, dev);
+        for (int i=0; i<n; ++i) {
+            double val = distribucion(generador);
+            //types like int32 will be rounded up
+            if constexpr (is_integral_v<T>) 
+                v.push_back(static_cast<T>(round(val)));
+            else
+                v.push_back(static_cast<T>(val));
+        }
+        return v;
+        
     }
 
     template<typename T>
