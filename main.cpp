@@ -20,7 +20,8 @@ int main(int argc, char** argv) {
         println("args: {}", argv[1]);
 
         
-        vector<int>sizes = {10000000, 100000000, 1000000000};
+        vector<int>sizes = {10000000, 100000000};
+        //may get stuck with 100000000
         vector<double>dev = {1.0, 5.0, 15.0, 30.0};
         vector<int>searchSize = {1000, 10000, 100000};
 
