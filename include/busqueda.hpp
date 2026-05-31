@@ -6,7 +6,7 @@ namespace Busqueda {
     using namespace std;
 
     template<typename T>
-    bool sample_range(vector<T> &sample, int b, T x, int n, int &L, int &R) {
+    bool sample_range(const vector<T> &sample, const int &b, const T &x, const int &n, int &L, int &R) {
         if (x < sample[0]) return false;
         auto it = upper_bound(sample.begin(), sample.end(), x);
         int sample_pos = it - sample.begin() - 1;
@@ -35,7 +35,7 @@ namespace Busqueda {
     */
 
     template <typename T>
-    bool GC_decode(vector<T> &GC, vector<T> &sample, T x, int b, int L, int R) {
+    bool GC_decode(const vector<T> &GC, const vector<T> &sample, const T &x, const int &b, const int &L, const int &R) {
         T curr = sample[L/b]; // A[L] = sample[L/b]
         if (curr == x) return true;
 

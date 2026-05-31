@@ -6,6 +6,7 @@
 #include <sstream>
 #include <print>
 #include "include/generar.hpp"
+#include "include/medicion.hpp"
 
 using namespace std;
 
@@ -18,12 +19,28 @@ int main(int argc, char** argv) {
         println("Benchmark mode");
         println("args: {}", argv[1]);
 
+        
+        vector<int>sizes = {10000000, 100000000, 1000000000};
+        vector<double>dev = {1.0, 5.0, 15.0, 30.0};
+        vector<int>searchSize = {1000, 10000, 100000};
+
+        Medicion::medicion<int32_t>(sizes, dev, searchSize);
+        
+        
+
+        /*
         //Initial vector
+
+        vector<int32_t>vec;
+        vector<int32_t>vec_gap;
+        vector<int32_t>vec_sample;
+        vector<int32_t>gauss;
+        vector<int32_t>gauss_gap;
+        vector<int32_t>gauss_sample;
+
         auto tgenerar1 = chrono::high_resolution_clock::now();
 
-        auto vec = Generar::vectorUniforme<int32_t>(1e7);
-	    sort(vec.begin(), vec.end());
-
+        Generar::vectorUniformeSorted<int32_t>(vec, 1e7);
         auto tgenerar2 = chrono::high_resolution_clock::now();
 	    auto tgenerar = std::chrono::duration_cast<std::chrono::milliseconds>(tgenerar2 - tgenerar1);
         size_t vec_elem_bytes = vec.size() * sizeof(decltype(vec)::value_type);
@@ -31,14 +48,14 @@ int main(int argc, char** argv) {
 	
         //gap vector
         auto tgap1 = chrono::high_resolution_clock::now();
-        auto vec_gap = Generar::vectorGap<int32_t>(vec, 1e7);
+        Generar::vectorGap<int32_t>(vec, vec_gap, 1e7);
         auto tgap2 = chrono::high_resolution_clock::now();
         auto tgap = std::chrono::duration_cast<std::chrono::milliseconds>(tgap2 - tgap1);
         size_t gap_elem_bytes = vec_gap.size() * sizeof(decltype(vec_gap)::value_type);
 
         //sample vector
         auto tsample1 = chrono::high_resolution_clock::now();
-        auto vec_sample = Generar::vectorSample<int32_t>(vec, 1e7);
+        Generar::vectorSample<int32_t>(vec, vec_sample, 1e7);
         auto tsample2 = chrono::high_resolution_clock::now();
         auto tsample = std::chrono::duration_cast<std::chrono::milliseconds>(tsample2 - tsample1);
         size_t sample_elem_bytes = vec_sample.size() * sizeof(decltype(vec_sample)::value_type);
@@ -48,8 +65,7 @@ int main(int argc, char** argv) {
         auto generar1 = chrono::high_resolution_clock::now();
 
         //numbers centered around 50, with spread of 15
-        auto gauss = Generar::vectorGauss<int32_t>(1e7, 50.0, 15.0);
-	    sort(gauss.begin(), gauss.end());
+        Generar::vectorGauss<int32_t>(gauss, 1e7, 5);
         //data type for gauss must be float, double, or long double
 
         auto generar2 = chrono::high_resolution_clock::now();
@@ -59,14 +75,14 @@ int main(int argc, char** argv) {
 	
         //gap vector
         auto gap1 = chrono::high_resolution_clock::now();
-        auto gauss_gap = Generar::vectorGap<int32_t>(gauss, 1e7);
+        Generar::vectorGap<int32_t>(gauss, gauss_gap, 1e7);
         auto gap2 = chrono::high_resolution_clock::now();
         auto gap = std::chrono::duration_cast<std::chrono::milliseconds>(gap2 - gap1);
         size_t gauss_gap_elem_bytes = gauss_gap.size() * sizeof(decltype(gauss_gap)::value_type);
 
         //sample vector
         auto sample1 = chrono::high_resolution_clock::now();
-        auto gauss_sample = Generar::vectorSample<int32_t>(gauss, 1e7);
+        Generar::vectorSample<int32_t>(gauss, gauss_sample, 1e7);
         auto sample2 = chrono::high_resolution_clock::now();
         auto sample = std::chrono::duration_cast<std::chrono::milliseconds>(sample2 - sample1);
         size_t gauss_sample_elem_bytes = gauss_sample.size() * sizeof(decltype(gauss_sample)::value_type);
@@ -83,6 +99,7 @@ int main(int argc, char** argv) {
         }
         lineal_vector.close();
 
+        //write to gauss vector
         if (filesystem::exists("gauss_vector.csv")) filesystem::remove("gauss_vector.csv");
         ofstream gauss_vector("gauss_vector.csv");
         if (gauss_vector.is_open()) {
@@ -128,7 +145,7 @@ int main(int argc, char** argv) {
         print("First 10 elements of the sorted vector: ");
 
         n = min(10, (int)gauss.size());
-        for (size_t i = 0; i < n; ++i) {
+        for (int i = 0; i < 1e7; ++i) {
             print("{} ", gauss[i]);
         }
         println();println();
@@ -151,7 +168,8 @@ int main(int argc, char** argv) {
             print("{} ", gauss_sample[i]);
         }
         println();println();
-
+        */
+        
     } else if (argc == 4) {
         println("Complete mode");
         println("args: {}, {}", argv[1], argv[2]);

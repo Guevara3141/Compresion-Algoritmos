@@ -25,7 +25,7 @@ namespace Compresion {
     }
 
     template <typename T>
-    pair <string, string> eliasFanoCodif(vector<T> A) {
+    pair <string, string> eliasFanoCodif(const vector<T> &A) {
         string low="";
         string high="";
         long long int n=(int)A.size();
