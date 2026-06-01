@@ -7,6 +7,7 @@
 #include <print>
 #include "include/generar.hpp"
 #include "include/medicion.hpp"
+#include "include/cases.hpp"
 
 using namespace std;
 
@@ -171,6 +172,30 @@ int main(int argc, char** argv) {
         println();println();
         */
         
+    } else if (argc == 3 && strncmp(argv[1], "-i", 2) == 0) {
+        string filepath = argv[2];
+        println("File mode, loading file {}", filepath);
+        ifstream file(filepath);
+        if (file.is_open()) {
+            vector<int32_t> initial_v;
+            string line, token;
+
+            while (getline(file, line)) {
+                stringstream ss(line);
+                while (getline(ss, token, ',')) {
+                    if(!token.empty()) {
+                        initial_v.push_back(atoi(token.c_str()));
+                    }
+                }
+            }
+
+            for (int i=0; i<(int)initial_v.size()-1; ++i) cout << initial_v[i] << " ";
+            cout << endl;
+
+            Case::cases(initial_v);
+
+        }
+    
     } else if (argc == 4) {
         println("Complete mode");
         println("args: {}, {}", argv[1], argv[2]);
