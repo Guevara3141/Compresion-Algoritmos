@@ -1,11 +1,3 @@
-<<<<<<< Updated upstream
-main: main.cpp include/generar.hpp
-	g++ -std=c++23 -o main main.cpp include/generar.hpp -Wno-unused-result
-
-.PHONY: run
-run: main
-	./main --benchmark 
-=======
 CXX = g++
 CXXFLAGS = -std=c++23 -O3 -Wall -Wno-unused-result
 
@@ -24,4 +16,3 @@ run: main
 # limpiar
 clean:
 	rm -f main
->>>>>>> Stashed changes
