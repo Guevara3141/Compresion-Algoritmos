@@ -3,10 +3,10 @@
 Proyecto Semestral de Técnicas de Representación y Compresión en Arreglos Ordenados
 
 ## Integrantes
--- Aaron Mancilla
--- Felipe Guevara
--- Agustin Estrada
--- Benjamin Gonzalez
+- Aaron Mancilla
+- Felipe Guevara
+- Agustin Estrada
+- Benjamin Gonzalez
 
 ## Descripción
 
@@ -36,10 +36,10 @@ Se miden tiempos de construcción, tiempos de búsqueda y espacio utilizado para
 
 ## Rango de Números Aceptados
 
-El programa trabaja con enteros de **32 bits con signo** (`int32_t`), por lo tanto el rango de valores válidos es:
+El programa trabaja internamente con enteros de 32 bits con signo (int32_t). Sin embargo, para garantizar el correcto funcionamiento del Caso 3 (Elias-Fano), el programa solo admite números enteros no negativos. Por lo tanto, el rango de valores válidos de entrada es:
 
 ```
--2,147,483,648  a  2,147,483,647
+0 a  2,147,483,647
 ```
 
 Para el **modo archivo** (`-i`), el archivo CSV debe contener números enteros dentro de ese rango, separados por comas (con o sin saltos de línea). Ver formato en la sección de entradas más abajo.
@@ -101,12 +101,6 @@ El archivo CSV debe contener números enteros separados por comas, con o sin sal
 201,350,400
 ```
 
-O en una sola línea:
-
-```
-12,45,78,102,200,201,350,400
-```
-
 Los números **deben estar ordenados de menor a mayor**. Ver `datos_gigantes.csv` (generado por `generar_csv_test.py`) como ejemplo.
 
 ## Archivos de Salida
@@ -157,10 +151,17 @@ Desea continuar? (s:1, n:0): 0
 
 ## Generación de Datos de Prueba
 
-Para generar un archivo CSV con 1.000.000 de números aleatorios ordenados:
+Para generar un archivo CSV con 1.000.000 (este cantidad se puede editar) de números aleatorios ordenados:
 
 ```bash
 python3 generar_csv_test.py
 ```
 
 Esto crea `datos_gigantes.csv` que puede usarse con el modo `-i`.
+
+Si deseas cambiar la cantidad de números generados o el nombre del archivo de salida, puedes editar directamente el archivo generar_csv_test.py. Modifica los parámetros en la última línea del archivo:
+
+```bash
+# Generar N datos (ej. 1000000)
+generar_datos_masivos("datos_gigantes.csv", 1000000)
+```
