@@ -57,10 +57,6 @@ namespace Busqueda {
         // x menor que el mínimo del arreglo
         if (x < sample[0]) return false;
 
-        // FIX (acciones 2 y 5): x mayor que el máximo del arreglo
-        // Sin este check, R podría ser n y GC/EF accederían a índice n (out-of-bounds)
-        if (x > sample.back()) return false;
-
         // Encontrar el primer elemento del sample estrictamente mayor que x
         auto it = upper_bound(sample.begin(), sample.end(), x);
         int sample_pos = it - sample.begin() - 1; // bloque del sample donde estaría x
