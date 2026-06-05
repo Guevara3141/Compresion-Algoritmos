@@ -13,6 +13,6 @@ main: main.cpp $(HEADERS)
 run: main
 	./main --benchmark 
 
-# limpiar
+# limpiar el binario
 clean:
 	rm -f main

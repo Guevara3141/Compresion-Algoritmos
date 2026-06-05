@@ -10,6 +10,30 @@
 #include "compresion.hpp"
 #include "busqueda.hpp"
 
+
+
+/**
+ * Benchmarking de los tres casos para distintos tamaños y distribuciones.
+ *
+ * Implementa la función `medicion()` que itera sobre tamaños y distribuciones,
+ * construye las tres estructuras de datos y mide tiempos y espacio para cada una.
+ * Los resultados se guardan en `mediciones.csv`.
+ *
+ * Estructura del experimento:
+ *
+ *   Para cada tamaño n en {sizes}:
+ *     Para distribución Lineal:
+ *       - Construir Caso 1 (arreglo ordenado), Caso 2 (gap + sample), Caso 3 (EF)
+ *       - Para cada cantidad de búsquedas en {searchSize}:
+ *           - Ejecutar búsquedas aleatorias sobre targets reales del arreglo
+ *           - Medir y registrar tiempos y bytes
+ *     Para cada desviación estándar en {deviations}:
+ *       - Repetir lo mismo con distribución Normal
+ *
+ * Las búsquedas se realizan sobre elementos que sí existen en el arreglo (hits garantizados),
+ * lo que permite medir el peor caso real de decodificación.
+ */
+
 namespace Medicion {
     using namespace std;
 

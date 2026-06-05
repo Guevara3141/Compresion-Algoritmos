@@ -6,6 +6,22 @@
 #include <iostream>
 #include <print>
 
+
+/**
+
+ * Modo interactivo: búsqueda manual en los tres casos.
+ *
+ * Implementa la función `cases()` que recibe un arreglo ordenado ya cargado
+ * desde archivo y permite al usuario buscar valores de forma interactiva,
+ * seleccionando el caso (estructura) a usar.
+ *
+ * Flujo de ejecución:
+ *   1. Se construyen automáticamente las tres estructuras a partir de A.
+ *   2. El usuario elige caso (1, 2 o 3) y el número a buscar.
+ *   3. Se ejecuta la búsqueda y se muestra el resultado con tiempo en microsegundos.
+ *   4. Se pregunta si desea continuar (otra búsqueda o salir).
+ */
+ 
 namespace Case {
     using namespace std;
     template <typename T>
