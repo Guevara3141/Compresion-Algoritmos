@@ -3,15 +3,20 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <cmath>
+#include <limits>
 
 /**
- *Funciones de generación de vectores para los tres casos del proyecto.
+ * @file generar.hpp
+ * @brief Funciones de generación de vectores para los tres casos del proyecto.
  *
  * Contiene utilidades para crear arreglos ordenados con distribución exponencial
  * (lineal) y gaussiana aproximada, junto con las estructuras auxiliares de
  * Gap-Coding y Sample usadas en los Casos 2 y 3.
  *
-
+ * NOTA: Todas las distribuciones generan valores no-negativos (int32_t >= 0)
+ * para compatibilidad con la codificación Elias-Fano, que opera sobre enteros
+ * no negativos. El rango válido es [0, 2^31 - 1].
  */
 
 namespace Generar {
@@ -22,12 +27,10 @@ namespace Generar {
     static mt19937 generador(rd());
 
     /**
-     * Genera un vector de n elementos aleatorios uniformes y lo ordena.
+     * @brief Genera un vector de n elementos aleatorios uniformes (no negativos) y lo ordena.
      *
-     * Los valores se distribuyen uniformemente en todo el rango del tipo T,
-     * luego se ordenan con std::sort. A diferencia de vectorUniformeSorted,
-     * esta versión no garantiza incrementos mínimos entre elementos (puede
-     * haber duplicados).
+     * Los valores se distribuyen uniformemente en [0, INT32_MAX],
+     * luego se ordenan con std::sort.
      *
      * @tparam T Tipo entero (ej. int32_t)
      * @param v Vector de salida (se reemplaza su contenido)
@@ -38,10 +41,8 @@ namespace Generar {
         v.clear();
         v.reserve(n);
 
-        uniform_int_distribution<T> distribucion(
-            numeric_limits<T>::min(),
-            numeric_limits<T>::max()
-        );
+        // Rango [0, max] para garantizar valores no-negativos (requerido por Elias-Fano)
+        uniform_int_distribution<T> distribucion(0, numeric_limits<T>::max());
 
         for (int i = 0; i < n; ++i)
             v.push_back(distribucion(generador));
@@ -54,16 +55,12 @@ namespace Generar {
      *
      * Cada elemento se construye sumando un incremento aleatorio con distribución
      * exponencial de parámetro lambda al acumulador anterior:
-     *
      *   curr += Exponencial(lambda)
      *
-     * Con lambda = 0.05, el incremento promedio entre elementos consecutivos es
-     * 1/lambda = 20. Esto produce una secuencia estrictamente creciente sin
-     * duplicados, representativa de datos tipo "timestamp" o "ID incremental".
+     * Con lambda = 0.05, el incremento promedio es 1/lambda = 20, produciendo
+     * una secuencia estrictamente creciente de enteros no-negativos.
      *
-     * Es la distribución usada para el Caso 1 (lineal) en el benchmark.
-     *
-     * @tparam T Tipo del vector de salida (int32_t, float, etc.)
+     * @tparam T Tipo del vector de salida (int32_t, etc.)
      * @param v Vector de salida
      * @param n Cantidad de elementos
      */
@@ -76,28 +73,30 @@ namespace Generar {
         exponential_distribution<double> distribucion(lambda);
         double curr_val = 0.0;
 
+        // Valor máximo del tipo T para prevenir overflow en el cast
+        const double t_max = static_cast<double>(numeric_limits<T>::max());
+
         for (int i = 0; i < n; ++i) {
             curr_val += distribucion(generador);
 
-            // Para tipos enteros, redondear al entero más cercano
+            // Clamp para prevenir overflow al castear a T (FIX: acción 7)
+            double clamped = min(curr_val, t_max);
+
             if constexpr (is_integral_v<T>)
-                v.push_back(static_cast<T>(round(curr_val)));
+                v.push_back(static_cast<T>(round(clamped)));
             else
-                v.push_back(static_cast<T>(curr_val));
+                v.push_back(static_cast<T>(clamped));
         }
     }
 
     /**
      * @brief Genera un vector de n elementos con distribución normal y lo ordena.
      *
-     * Los valores se sampean de N(0, dev) y luego se ordenan con std::sort.
-     * Útil para generar datos con alta concentración alrededor del centro.
+     * Los valores se sampean de N(offset, dev) donde offset es un valor positivo
+     * grande para garantizar que todos los valores sean no-negativos, compatible
+     * con Elias-Fano.
      *
-     * Nota: al usar sort después de samplear, la secuencia resultante es
-     * genuinamente gaussiana pero no tiene incrementos crecientes controlados.
-     * Para una versión que garantice orden sin sort, ver vectorGaussSorted.
-     *
-     * @tparam T Tipo del vector (int32_t, double, etc.)
+     * @tparam T Tipo del vector (int32_t, etc.)
      * @param v Vector de salida
      * @param n Cantidad de elementos
      * @param dev Desviación estándar de la distribución normal
@@ -107,9 +106,19 @@ namespace Generar {
         v.clear();
         v.reserve(n);
 
-        normal_distribution<double> distribucion(0, dev);
+        // Offset positivo para garantizar valores >= 0 (requerido por Elias-Fano)
+        // Se usa INT32_MAX/2 como centro para dejar espacio a ambos lados
+        const double offset = static_cast<double>(numeric_limits<int32_t>::max()) / 2.0;
+        const double t_max  = static_cast<double>(numeric_limits<T>::max());
+        const double t_min  = 0.0; // Elias-Fano requiere no-negativos
+
+        normal_distribution<double> distribucion(offset, dev);
+
         for (int i = 0; i < n; ++i) {
             double val = distribucion(generador);
+
+            // Clamp para prevenir overflow (FIX: acción 7)
+            val = clamp(val, t_min, t_max);
 
             if constexpr (is_integral_v<T>)
                 v.push_back(static_cast<T>(round(val)));
@@ -121,28 +130,17 @@ namespace Generar {
     }
 
     /**
-     * @brief Genera un vector de n elementos ya ordenado con forma aproximadamente gaussiana,
-     *        sin usar sort explícito.
+     * @brief Genera un vector de n elementos ya ordenado con forma gaussiana,
+     *        centrado en INT32_MAX/2 para garantizar valores no-negativos.
      *
-     * En lugar de samplear N(0, dev) y ordenar, esta función construye los valores
-     * directamente en orden creciente usando la función cuantil de la normal (inversa
-     * de la CDF). El proceso es:
+     * Construye los valores directamente en orden creciente usando la función
+     * cuantil de la normal (inversa de la CDF). El proceso es:
+     *   1. Se acumula probabilidad p usando pasos pequeños con jitter aleatorio.
+     *   2. Para cada p, se calcula el cuantil y se escala con dev y offset.
+     *   3. Los valores se clampean a [0, T_MAX] para prevenir overflow.
      *
-     *   1. Se acumula un probabilidad p usando pasos pequeños con jitter aleatorio,
-     *      para simular puntos de cuantil igualmente espaciados con algo de ruido.
-     *   2. Para cada p, se calcula el valor del cuantil usando la aproximación:
-     *        r = sqrt(-2 * log(min(p, 1-p)))
-     *        val = r * cos(π*(1-p)) * dev
-     *   3. Los valores resultantes están ya en orden creciente por construcción.
-     *
-     * El jitter en el paso de probabilidad evita que los elementos queden
-     * perfectamente equiespaciados en cuantil, dando una distribución más natural.
-     *
-     * Advertencia: la aproximación no es exactamente N(0,dev) pero tiene la misma
-     * forma acampanada y concentración central. Suficiente para los experimentos
-     * del proyecto.
-     *
-     * Es la función usada para el Caso Normal en el benchmark (evita el costo de sort).
+     * El offset (INT32_MAX/2) garantiza que todos los valores sean no-negativos,
+     * requisito de la codificación Elias-Fano (FIX: acciones 3 y 7).
      *
      * @tparam T Tipo del vector
      * @param v Vector de salida
@@ -154,20 +152,27 @@ namespace Generar {
         v.clear();
         v.reserve(n);
 
-        const double pi = acos(-1.0);
-        const double mean = 0.0;
-        uniform_real_distribution<double> jitter(0.5, 1.5); // ruido sobre el paso de cuantil
+        const double pi     = acos(-1.0);
+        // Offset positivo: centra la gaussiana en la mitad del rango positivo de int32_t
+        // Esto garantiza que valores hasta ~3*dev sigan siendo no-negativos
+        const double offset = static_cast<double>(numeric_limits<int32_t>::max()) / 2.0;
+        const double t_max  = static_cast<double>(numeric_limits<T>::max());
+        const double t_min  = 0.0;
+
+        uniform_real_distribution<double> jitter(0.5, 1.5);
         double p_accumulator = 0.0;
-        double base_step = 1.0 / (n + 100.0); // paso base para recorrer [0, 1]
+        double base_step = 1.0 / (n + 100.0);
 
         for (int i = 0; i < n; ++i) {
-            p_accumulator += base_step * jitter(generador); // avanzar con jitter
-            double p = clamp(p_accumulator, 1e-9, 1 - 1e-9); // evitar log(0)
+            p_accumulator += base_step * jitter(generador);
+            double p = clamp(p_accumulator, 1e-9, 1.0 - 1e-9);
 
-            // Aproximación de la inversa de la CDF normal usando la fórmula de Box-Muller parcial
-            double r = sqrt(-2 * log(min(p, 1 - p)));
-            double val = r * cos(pi * (1 - p));
-            val = val * dev + mean;
+            double r   = sqrt(-2.0 * log(min(p, 1.0 - p)));
+            double val = r * cos(pi * (1.0 - p));
+            val = val * dev + offset; // escalar con dev y centrar en offset positivo
+
+            // Clamp estricto para prevenir overflow al castear (FIX: acción 7)
+            val = clamp(val, t_min, t_max);
 
             if constexpr (is_integral_v<T>)
                 v.push_back(static_cast<T>(round(val)));
@@ -179,20 +184,15 @@ namespace Generar {
     /**
      * @brief Construye el arreglo de Gap-Coding a partir de un arreglo ordenado.
      *
-     * Representa cada elemento como la diferencia respecto al anterior:
-     *   gap[0] = v[0]
-     *   gap[i] = v[i] - v[i-1]   para i > 0
+     * gap[0] = v[0]
+     * gap[i] = v[i] - v[i-1]   para i > 0
      *
      * Ejemplo: v = [2, 7, 10, 12] → gap = [2, 5, 3, 2]
      *
-     * Con distribuciones de incremento pequeño (como vectorUniformeSorted con
-     * lambda=0.05), los gaps son en promedio ~20, lo que permite comprimirlos
-     * en muchos menos bits que los valores originales de 32 bits.
-     *
      * @tparam T Tipo entero
-     * @param v Arreglo ordenado original (entrada)
+     * @param v   Arreglo ordenado original (entrada)
      * @param gap Arreglo de gaps resultante (salida)
-     * @param n Cantidad de elementos
+     * @param n   Cantidad de elementos
      */
     template<typename T>
     void vectorGap(const vector<T> &v, vector<T> &gap, const int &n) {
@@ -208,24 +208,18 @@ namespace Generar {
      * @brief Construye el índice de muestreo (sample) del arreglo original.
      *
      * Almacena cada b-ésimo elemento del arreglo v (con b = 1024).
-     * El sample permite búsqueda binaria para acotar rápidamente el rango [L, R]
-     * antes de decodificar secuencialmente sobre GC o Elias-Fano.
-     *
-     * Ejemplo: v = [2, 7, 10, 12, 15, 18, ...], b = 2 → sample = [2, 10, 15, ...]
-     *
      * Tamaño resultante: ceil(n / b) ≈ n/1024 elementos.
-     * Para n = 10^7 → sample tiene ~9766 entradas.
      *
      * @tparam T Tipo entero
-     * @param v Arreglo original ordenado (entrada)
+     * @param v      Arreglo original ordenado (entrada)
      * @param sample Índice de muestreo resultante (salida)
-     * @param n Cantidad de elementos en v
+     * @param n      Cantidad de elementos en v
      */
     template<typename T>
     void vectorSample(const vector<T> &v, vector<T> &sample, const int &n) {
         sample.clear();
-        sample.reserve(n);
         int b = 1024; // salto estático (debe coincidir con busqueda.hpp y cases.hpp)
+        sample.reserve(n / b + 1);
         int i = 0;
         while (i < (int)v.size()) {
             sample.push_back(v[i]);
