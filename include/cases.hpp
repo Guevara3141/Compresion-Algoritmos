@@ -50,18 +50,18 @@ namespace Case {
         bool cont = true;
         while (cont) {
 
-	    int case_num = 0, number = 0;
-	    print("Ingrese caso (1, 2, 3 o 0 para TERMINAR): ");
-	    cin >> case_num;
-
-	    if (case_num == 0) return;
-	    if (case_num < 0 || case_num > 3) {
-		println("Caso invalido. Ingrese 1, 2, 3 o 0.");
-		continue;
-	    }
-
-	    print("Ingrese numero a buscar: ");
-	    cin >> number;
+	        int case_num = 0, number = 0;
+	        print("Ingrese caso (1, 2, 3 o 0 para TERMINAR): ");
+	        cin >> case_num;
+            
+	        if (case_num == 0) return;
+	        if (case_num < 0 || case_num > 3) {
+		        println("Caso invalido. Ingrese 1, 2, 3 o 0.");
+		        continue;
+	        }
+        
+	        print("Ingrese numero a buscar: ");
+	        cin >> number;
 
             // -------------------------------------------------------
             // CASO 1: Búsqueda binaria sobre el arreglo original
@@ -112,7 +112,7 @@ namespace Case {
 
                     if (found) println("Numero encontrado con Elias-Fano en {} us", tsearch.count());
                     else       println("Numero no fue encontrado.");
-		}
+		        }
             }
         }
     }
