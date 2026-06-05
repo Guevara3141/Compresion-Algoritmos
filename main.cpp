@@ -32,7 +32,7 @@ using namespace std;
 int main(int argc, char** argv) {
 
     // Validar cantidad de argumentos (2 para --benchmark, 3 para -i <archivo>)
-    if (argc < 2 || argc > 4)
+    if (argc < 2 || argc > 3)
         return (println("Usage: ./main --benchmark  |  ./main -i <archivo.csv>"), 1);
 
     // ============================================================
@@ -78,6 +78,7 @@ int main(int argc, char** argv) {
                 while (getline(ss, token, ',')) {
                     if (!token.empty()) {
                         // atoi convierte string a int; rango válido: int32_t [-2^31, 2^31-1]
+			// TODO: añadir validación de que el número esté en el rango válido
                         initial_v.push_back(atoi(token.c_str()));
                     }
                 }
@@ -92,9 +93,6 @@ int main(int argc, char** argv) {
         }
 
 
-    } else if (argc == 4) {
-        println("Complete mode");
-        println("args: {}, {}", argv[1], argv[2]);
     }
 
     return 0;
