@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
                 while (getline(ss, token, ',')) {
                     if (!token.empty()) {
                         // atoi convierte string a int; rango válido: int32_t [-2^31, 2^31-1]
-			// TODO: añadir validación de que el número esté en el rango válido
+			            // TODO: añadir validación de que el número esté en el rango válido
                         initial_v.push_back(atoi(token.c_str()));
                     }
                 }
@@ -91,8 +91,6 @@ int main(int argc, char** argv) {
             // Iniciar sesión interactiva: el usuario elige caso y número a buscar
             Case::cases(initial_v);
         }
-
-
     }
 
     return 0;
