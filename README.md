@@ -148,11 +148,11 @@ archivo creado en mediciones.csv
 ```bash
 ./main -i datos_gigantes.csv
 
-Ingrese caso (1, 2, 3 o 0 para VOLVER): 1
+Ingrese caso (1, 2, 3 o 0 para TERMINAR): 1
 Ingrese numero a buscar: 5042
 Numero encontrado en posicion 412, en 3 us
 
-Desea continuar? (s:1, n:0): 0
+Ingrese caso (1, 2, 3 o 0 para TERMINAR): 0
 ```
 
 ## Generación de Datos de Prueba

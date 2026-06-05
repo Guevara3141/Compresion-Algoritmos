@@ -17,9 +17,9 @@
  *
  * Flujo de ejecución:
  *   1. Se construyen automáticamente las tres estructuras a partir de A.
- *   2. El usuario elige caso (1, 2 o 3) y el número a buscar.
- *   3. Se ejecuta la búsqueda y se muestra el resultado con tiempo en microsegundos.
- *   4. Se pregunta si desea continuar (otra búsqueda o salir).
+ *   2. El usuario elige caso (1, 2 o 3) y el número a buscar o 0 para terminar la ejecución.
+ *   3. Se ejecuta la búsqueda y se muestra el resultado con tiempo en microsegundos (us).
+ *   4. Se repite el paso 2.
  */
  
 namespace Case {
@@ -40,14 +40,14 @@ namespace Case {
         Compresion::EliasFano ef = Compresion::eliasFanoCodif(A);
 
         int case_num, number;
-        print("Ingrese caso (1, 2, 3 o 0 para VOLVER): "); cin >> case_num;
-        
-        if (case_num == 0) return; // Abortar ejecución de inmediato
-        
-        print("Ingrese numero a buscar: "); cin >> number;
 
         bool cont = true;
         while (cont) {
+	    print("Ingrese caso (1, 2, 3 o 0 para TERMINAR): "); cin>>case_num;
+	    if (case_num == 0) return;
+	    if (case_num < 0 || case_num > 3) continue;
+	    print("Ingrese numero a buscar: "); cin>>number;
+
             if (case_num == 1) {
                 auto tsearch1 = chrono::high_resolution_clock::now();
                 auto it = lower_bound(A.begin(), A.end(), number);
@@ -84,15 +84,6 @@ namespace Case {
                 
                 if (found) println("Numero encontrado con Elias-Fano en {} us", tsearch.count());
                 else println("Numero no fue encontrado.");
-            }
-
-            string req;
-            print("Desea continuar? (s:1, n:0) : "); cin >> req;
-            if (req == "n" || req == "0") cont = false;
-            else {
-                print("Ingrese caso (1, 2, 3 o 0 para VOLVER): "); cin>>case_num;
-                if (case_num == 0) return;
-                print("Ingrese numero a buscar: "); cin>>number;
             }
         }
     } 
